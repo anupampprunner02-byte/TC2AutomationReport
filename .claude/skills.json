@@ -1,0 +1,14 @@
+{
+  "skills": [
+    {
+        "name": "playwright-test-generator",
+        "description": "Generate Playwright tests when user asks for testcases",
+        "prompt": "Before generating, follow rules defined in: .claude/agents/playwright-agent.md and app-config.md. Then generate a complete Playwright test using POM, proper locators, assertions, and project conventions."
+    },
+    {
+        "name": "playwright-test-healer",
+        "description": "Trigger when user mentions failing test, error, or fix test",
+        "prompt": "Follow the test-healer workflow defined in .claude/agents/test-healer.md. Diagnose failure, identify root cause, fix in correct layer (locator/page/testdata), and explain changes."
+    }
+  ]
+}

@@ -1,0 +1,1637 @@
+================================================================================
+ PLAYWRIGHT BASE FRAMEWORK — COMPLETE PROJECT REFERENCE
+ Generate a new automation project from scratch — step by step
+================================================================================
+ Framework: Playwright + TypeScript
+ Pattern: Page Object Model (POM)
+ AI Integration: Claude Code (MCP + Slash Commands)
+ Reporting: Allure + Playwright HTML
+================================================================================
+
+TABLE OF CONTENTS
+─────────────────
+ 1.  Project Overview
+ 2.  Tech Stack & Dependencies
+ 3.  Complete Directory Structure
+ 4.  Step-by-Step Setup from Scratch
+ 5.  Configuration Files (exact content)
+ 6.  Source File Templates (exact content)
+ 7.  Utility Files (exact content)
+ 8.  Test Management System
+ 9.  Claude Code Integration
+10.  Slash Command Workflows
+11.  Framework Conventions & Rules
+12.  Locator Priority Strategy
+13.  Wait Strategies
+14.  Test Reliability Patterns
+15.  Auth & Project Mapping
+16.  Running Tests
+17.  Reporting
+18.  Anti-Patterns (NEVER do these)
+19.  Debugging Guide
+20.  Knowledge Layer System
+21.  File Naming Reference
+
+
+================================================================================
+ 1. PROJECT OVERVIEW
+================================================================================
+
+This is a generic, production-ready Playwright + TypeScript end-to-end test
+automation framework. It is designed to be cloned and adapted for any web
+application with minimal configuration effort.
+
+Key capabilities:
+ - Page Object Model (POM) for maintainable, reusable test code
+ - AI-assisted test generation via Claude Code slash commands
+ - Playwright MCP integration for live browser inspection
+ - Auth session caching (login once, reuse across all tests)
+ - Allure + HTML reporting with automatic screenshots
+ - Excel-based test case import and progress tracking
+ - 6-layer knowledge system to avoid re-discovering known patterns
+
+Repository: https://github.com/manishamrinal/ai-qa-ecosystem
+
+
+================================================================================
+ 2. TECH STACK & DEPENDENCIES
+================================================================================
+
+CORE RUNTIME
+ - Node.js          >= 18.x (ESM module support required)
+ - TypeScript       ESNext target, strict mode
+ - Playwright       ^1.58.2 (browser automation)
+ - @playwright/test ^1.58.2 (test runner)
+
+REPORTING
+ - allure-playwright  ^3.6.0 (Allure reporter integration)
+ - allure-commandline ^2.37.0 (Allure CLI for report generation)
+
+UTILITIES
+ - dotenv  ^17.3.1 (environment variable management)
+ - xlsx    ^0.18.5 (Excel test case import)
+
+AI INTEGRATION
+ - playwright-mcp ^0.0.10 (Playwright MCP server for Claude Code)
+
+FULL package.json DEPENDENCIES:
+ devDependencies:
+   "@playwright/test": "^1.58.2"
+   "@types/node": "^25.3.5"
+   "allure-commandline": "^2.37.0"
+   "allure-playwright": "^3.6.0"
+   "dotenv": "^17.3.1"
+   "xlsx": "^0.18.5"
+
+ dependencies:
+   "playwright": "^1.58.2"
+   "playwright-mcp": "^0.0.10"
+
+
+================================================================================
+ 3. COMPLETE DIRECTORY STRUCTURE
+================================================================================
+
+project-root/
+│
+├── .claude/                          # Claude Code AI configuration
+│   ├── agents/
+│   │   ├── playwright-agent.md       # POM standards, conventions, anti-patterns
+│   │   ├── app-config.md             # App-specific config (edit for your app)
+│   │   ├── knowledge-layer.md        # 6-layer knowledge check system
+│   │   ├── playwright-qa-engineer.md # Agent definition for test creation
+│   │   └── test-healer.md            # Agent for diagnosing/fixing failures
+│   ├── commands/
+│   │   ├── write-test.md             # /write-test slash command workflow
+│   │   ├── discover-page.md          # /discover-page slash command workflow
+│   │   ├── heal-test.md              # /heal-test slash command workflow
+│   │   └── next-test.md              # /next-test slash command workflow
+│   ├── settings.local.json           # MCP & Bash permission allowlist
+│   └── skills.json                   # AI skill definitions
+│
+├── src/
+│   ├── data/
+│   │   ├── allURL.ts                 # All application URLs (update for your app)
+│   │   ├── testdata.json             # Test data with $ENV_VAR placeholders
+│   │   └── testdata.ts               # Env var resolver — ALWAYS import from here
+│   ├── fixtures/
+│   │   ├── .auth/
+│   │   │   └── user.json             # Cached auth session (gitignored)
+│   │   ├── baseTest.ts               # Extended test fixture (ALWAYS import)
+│   │   └── auth.setup.ts             # Login setup — runs once before tests
+│   ├── locators/
+│   │   └── example.locators.ts       # Example locator class (copy for new pages)
+│   ├── pages/
+│   │   └── example.page.ts           # Example page object (copy for new pages)
+│   ├── tests/
+│   │   └── example.spec.ts           # Example test spec (copy for new features)
+│   └── utils/
+│       ├── assertUtils.ts            # Custom assertion helpers
+│       ├── elementUtils.ts           # Safe element interaction helpers
+│       ├── screenshotUtils.ts        # Screenshot with timestamp
+│       ├── timeUtils.ts              # Date/time utilities
+│       └── waitUtils.ts              # Custom wait conditions
+│
+├── test-management/
+│   ├── testcases.json                # Parsed test cases (from Excel or manual)
+│   ├── tracker.json                  # Test case status (pending/done/skipped)
+│   ├── page-knowledge.json           # Page interaction knowledge base
+│   ├── parse-testcases.ts            # Excel → JSON parser script
+│   └── next-testcase.ts              # Test case CLI management script
+│
+├── test-results/                     # Playwright traces & videos (gitignored)
+├── playwright-report/                # Playwright HTML report (gitignored)
+├── allure-results/                   # Allure raw data (gitignored)
+├── allure-report/                    # Allure HTML report (gitignored)
+├── reports/
+│   └── screenshots/                  # Auto-captured screenshots (gitignored)
+├── mcp-output/                       # Playwright MCP browser output (gitignored)
+│
+├── .mcp.json                         # Playwright MCP server configuration
+├── .env                              # Secrets (gitignored — copy from .env.example)
+├── .env.example                      # Template for environment variables
+├── .gitignore                        # Git exclusions
+├── CLAUDE.md                         # Claude Code entry point instructions
+├── README.md                         # Project documentation
+├── playwright.config.ts              # Playwright test configuration
+├── tsconfig.json                     # TypeScript compiler configuration
+├── package.json                      # NPM package config & scripts
+└── package-lock.json
+
+
+================================================================================
+ 4. STEP-BY-STEP SETUP FROM SCRATCH
+================================================================================
+
+STEP 1 — Clone or initialize the repository
+─────────────────────────────────────────────
+  git clone https://github.com/manishamrinal/ai-qa-ecosystem.git my-project
+  cd my-project
+
+  OR create fresh:
+  mkdir my-project && cd my-project
+  git init
+  npm init -y
+
+STEP 2 — Install all dependencies
+────────────────────────────────────
+  npm install
+  npx playwright install
+
+  This installs Playwright browsers (Chromium, Firefox, WebKit).
+
+STEP 3 — Configure environment variables
+─────────────────────────────────────────
+  cp .env.example .env
+
+  Edit .env and set:
+    LOGIN_EMAIL=your-test-user@example.com
+    LOGIN_PASSWORD=your-test-password
+    BASE_URL=https://your-app.example.com
+
+STEP 4 — Configure application URLs
+──────────────────────────────────────
+  Edit src/data/allURL.ts:
+  - Replace localhost:3000 URLs with your app's actual URLs
+  - Add new URL entries for each page you want to test
+
+STEP 5 — Configure auth setup
+────────────────────────────────
+  Edit src/fixtures/auth.setup.ts:
+  - Update login page selectors to match your app
+  - Update the post-login URL pattern in waitForURL()
+  - Update login button text/selector
+
+STEP 6 — Configure test data
+──────────────────────────────
+  Edit src/data/testdata.json:
+  - Add test data for your application
+  - Use $ENV_VAR placeholders for any sensitive values
+  - Keep invalidUser data for negative test cases
+
+STEP 7 — Configure Claude Code (if using AI assistance)
+─────────────────────────────────────────────────────────
+  Edit .claude/agents/app-config.md:
+  - Fill in your application name and environment
+  - Document your auth method
+  - Add your URL catalog
+  - Document page objects as you build them
+
+STEP 8 — (Optional) Import test cases from Excel
+──────────────────────────────────────────────────
+  npm run tc:parse -- MyTestCases.xlsx
+
+  Excel columns expected:
+    Module | Function/Screen | Scenario | User Entity | User Role |
+    Preconditions | Test Steps | Expected Result | Test Data
+
+STEP 9 — Discover pages and scaffold page objects
+────────────────────────────────────────────────────
+  In Claude Code:
+    /discover-page https://your-app.example.com/login
+    /discover-page https://your-app.example.com/dashboard
+
+  This uses Playwright MCP to inspect live pages and auto-generates:
+    - src/locators/<feature>.locators.ts
+    - src/pages/<feature>.page.ts
+
+STEP 10 — Write tests
+───────────────────────
+  Manually (copy example files) OR via Claude Code:
+    /write-test TC01
+    /write-test "Login with valid credentials shows dashboard"
+    /next-test
+
+STEP 11 — Run tests
+─────────────────────
+  npm test                                              # all tests
+  npx playwright test src/tests/login.spec.ts --project=chromium-no-auth
+  npx playwright test src/tests/dashboard.spec.ts --project=chromium
+
+STEP 12 — Generate reports
+────────────────────────────
+  npm run allure:generate && npm run allure:open
+  npx playwright show-report
+
+
+================================================================================
+ 5. CONFIGURATION FILES (exact content)
+================================================================================
+
+─────────────────────────────────────────────────────────────
+FILE: package.json
+─────────────────────────────────────────────────────────────
+{
+  "name": "playwright-base-framework",
+  "version": "1.0.0",
+  "description": "Generic Playwright + TypeScript QA automation framework using Page Object Model with Claude Code integration",
+  "main": "index.js",
+  "type": "module",
+  "scripts": {
+    "test": "npx playwright test",
+    "allure:generate": "allure generate ./allure-results --clean",
+    "allure:open": "allure open",
+    "tc:parse": "npx tsx test-management/parse-testcases.ts",
+    "tc:parse:file": "npx tsx test-management/parse-testcases.ts",
+    "tc:next": "npx tsx test-management/next-testcase.ts",
+    "tc:status": "npx tsx test-management/next-testcase.ts status",
+    "tc:done": "npx tsx test-management/next-testcase.ts done",
+    "tc:skip": "npx tsx test-management/next-testcase.ts skip",
+    "tc:show": "npx tsx test-management/next-testcase.ts show"
+  },
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.3.5",
+    "allure-commandline": "^2.37.0",
+    "allure-playwright": "^3.6.0",
+    "dotenv": "^17.3.1",
+    "xlsx": "^0.18.5"
+  },
+  "dependencies": {
+    "playwright": "^1.58.2",
+    "playwright-mcp": "^0.0.10"
+  }
+}
+
+─────────────────────────────────────────────────────────────
+FILE: tsconfig.json
+─────────────────────────────────────────────────────────────
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "esModuleInterop": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "resolveJsonModule": true,
+    "allowSyntheticDefaultImports": true,
+    "forceConsistentCasingInFileNames": true,
+    "types": ["node", "@playwright/test"]
+  },
+  "include": [
+    "src/**/*",
+    "playwright.config.ts",
+    "test-management/**/*"
+  ]
+}
+
+─────────────────────────────────────────────────────────────
+FILE: playwright.config.ts
+─────────────────────────────────────────────────────────────
+import { defineConfig, devices } from '@playwright/test';
+import dotenv from 'dotenv';
+dotenv.config();
+
+export default defineConfig({
+  testDir: './src/tests',
+
+  fullyParallel: true,
+
+  forbidOnly: !!process.env.CI,
+
+  retries: process.env.CI ? 2 : 2,
+
+  workers: process.env.CI ? 1 : 1,
+
+  timeout: 180000,
+
+  expect: {
+    timeout: 10000
+  },
+
+  reporter: [
+    ['list'],
+    ['html', { open: 'never' }],
+    ['allure-playwright']
+  ],
+
+  use: {
+    headless: true,
+    trace: 'retain-on-failure',
+    screenshot: 'only-on-failure',
+    video: 'retain-on-failure',
+    actionTimeout: 30000,
+    navigationTimeout: 30000
+  },
+
+  reportSlowTests: {
+    max: 0,
+    threshold: 30000
+  },
+
+  projects: [
+    // Auth setup — runs once, saves session to reuse
+    {
+      name: 'setup',
+      testDir: './src/fixtures',
+      testMatch: /auth\.setup\.ts/,
+    },
+
+    // Main project — reuses auth session (use for all non-login tests)
+    {
+      name: 'chromium',
+      testIgnore: /login\.spec\.ts/,
+      use: {
+        ...devices['Desktop Chrome'],
+        storageState: 'src/fixtures/.auth/user.json',
+      },
+      dependencies: ['setup'],
+    },
+
+    // Login tests — clean session, no cached auth
+    {
+      name: 'chromium-no-auth',
+      use: { ...devices['Desktop Chrome'] },
+      testMatch: /login\.spec\.ts/,
+    },
+  ],
+});
+
+─────────────────────────────────────────────────────────────
+FILE: .env.example
+─────────────────────────────────────────────────────────────
+# Copy this file to .env and fill in your values
+# Never commit .env to source control
+
+LOGIN_EMAIL=test@example.com
+LOGIN_PASSWORD=your-password-here
+BASE_URL=https://your-app.example.com
+
+─────────────────────────────────────────────────────────────
+FILE: .mcp.json
+─────────────────────────────────────────────────────────────
+{
+  "mcpServers": {
+    "playwright": {
+      "command": "npx",
+      "args": [
+        "@playwright/mcp",
+        "--isolated",
+        "--storage-state", "src/fixtures/.auth/user.json",
+        "--output-dir", "./mcp-output"
+      ]
+    }
+  }
+}
+
+─────────────────────────────────────────────────────────────
+FILE: .claude/settings.local.json
+─────────────────────────────────────────────────────────────
+{
+  "permissions": {
+    "allow": [
+      "mcp__playwright__browser_navigate",
+      "mcp__playwright__browser_snapshot",
+      "mcp__playwright__browser_fill_form",
+      "mcp__playwright__browser_click",
+      "mcp__playwright__browser_wait_for",
+      "mcp__playwright__browser_type",
+      "mcp__playwright__browser_evaluate",
+      "mcp__playwright__browser_take_screenshot",
+      "mcp__playwright__browser_close",
+      "mcp__playwright__browser_press_key",
+      "mcp__playwright__browser_run_code",
+      "mcp__playwright__browser_drag",
+      "mcp__playwright__browser_hover",
+      "mcp__playwright__browser_network_requests",
+      "Bash(npx playwright:*)",
+      "Bash(npx playwright test:*)",
+      "Bash(npx tsx:*)",
+      "Bash(npx tsc:*)",
+      "Bash(npm run:*)",
+      "Bash(npm install:*)",
+      "Bash(node:*)",
+      "Bash(grep:*)"
+    ]
+  },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": [
+    "playwright"
+  ],
+  "mcpServers": {}
+}
+
+─────────────────────────────────────────────────────────────
+FILE: .gitignore
+─────────────────────────────────────────────────────────────
+node_modules/
+.env
+src/fixtures/.auth/
+test-results/
+playwright-report/
+allure-results/
+allure-report/
+reports/
+mcp-output/
+
+─────────────────────────────────────────────────────────────
+FILE: CLAUDE.md
+─────────────────────────────────────────────────────────────
+# Claude Code Instructions
+
+Playwright + TypeScript QA automation framework using Page Object Model.
+Read these files in order before doing anything:
+
+1. **`.claude/agents/playwright-agent.md`** — Framework rules: POM conventions,
+   test structure, locator priority, anti-patterns
+2. **`.claude/agents/app-config.md`** — App-specific config: auth, URLs,
+   test case tracking, run commands
+3. **`.claude/agents/knowledge-layer.md`** — 6-layer knowledge check system
+
+## Getting Started with a New Application
+1. Copy `.env.example` to `.env` and add your credentials
+2. Update `src/data/allURL.ts` with your app's URLs
+3. Update `src/fixtures/auth.setup.ts` with your login flow
+4. Update `src/data/testdata.json` with your test data
+5. Update `.claude/agents/app-config.md` with your app details
+6. Use `/discover-page <url>` to explore pages and scaffold page objects
+7. Use `/write-test <description>` to implement test cases
+
+## Custom Slash Commands
+- `/write-test <id or description>` — Full workflow: implement → run → mark done
+- `/discover-page <url or page name>` — MCP explore → scaffold locators + page obj
+- `/next-test` — Pick up next pending test case and implement it
+- `/heal-test <file or TC id>` — Diagnose and fix failing tests
+
+## Project Conventions
+- **Imports**: Always use `src/fixtures/baseTest.ts`, never `@playwright/test`
+- **Test data**: `import testData from '../data/testdata'` (NOT testdata.json)
+- **Secrets**: Use `$ENV_VAR` placeholders in testdata.json, values in .env
+- **Test naming**: `TCXX - description` pattern
+- **Page Object Model**: Locators in `src/locators/`, pages in `src/pages/`
+
+
+================================================================================
+ 6. SOURCE FILE TEMPLATES (exact content)
+================================================================================
+
+─────────────────────────────────────────────────────────────
+FILE: src/data/allURL.ts
+─────────────────────────────────────────────────────────────
+export const URLs = {
+  // TODO: Replace with your application's URLs
+  login: process.env.BASE_URL
+    ? `${process.env.BASE_URL}/login`
+    : 'http://localhost:3000/login',
+  dashboard: process.env.BASE_URL
+    ? `${process.env.BASE_URL}/dashboard`
+    : 'http://localhost:3000/dashboard',
+};
+
+  HOW TO EXTEND:
+  Add new entries for each page under test:
+    profile: process.env.BASE_URL ? `${process.env.BASE_URL}/profile` : 'http://localhost:3000/profile',
+    settings: process.env.BASE_URL ? `${process.env.BASE_URL}/settings` : 'http://localhost:3000/settings',
+
+─────────────────────────────────────────────────────────────
+FILE: src/data/testdata.json
+─────────────────────────────────────────────────────────────
+{
+  "login": {
+    "validUser": {
+      "email": "$LOGIN_EMAIL",
+      "password": "$LOGIN_PASSWORD"
+    },
+    "invalidUser": {
+      "email": "invalid@example.com",
+      "password": "wrongpassword"
+    }
+  },
+  "example": {
+    "validInput": "sample value",
+    "searchQuery": "test search"
+  }
+}
+
+  RULES:
+  - All test data goes here — never hardcode in test files
+  - Use $ENV_VAR syntax for any sensitive values (resolved at runtime)
+  - Non-sensitive static data can be written directly as strings
+
+─────────────────────────────────────────────────────────────
+FILE: src/data/testdata.ts
+─────────────────────────────────────────────────────────────
+import rawData from './testdata.json' with { type: 'json' };
+
+function resolveEnvVars(obj: unknown): unknown {
+  if (typeof obj === 'string' && obj.startsWith('$')) {
+    const envKey = obj.slice(1);
+    const value = process.env[envKey];
+    if (!value) throw new Error(
+      `Environment variable ${envKey} is not set. Check your .env file.`
+    );
+    return value;
+  }
+  if (Array.isArray(obj)) return obj.map(resolveEnvVars);
+  if (obj !== null && typeof obj === 'object') {
+    return Object.fromEntries(
+      Object.entries(obj).map(([k, v]) => [k, resolveEnvVars(v)])
+    );
+  }
+  return obj;
+}
+
+const testData = resolveEnvVars(rawData) as typeof rawData;
+export default testData;
+
+  NOTE: This file resolves all $ENV_VAR placeholders recursively.
+  ALWAYS import from testdata.ts, never from testdata.json directly.
+
+─────────────────────────────────────────────────────────────
+FILE: src/fixtures/baseTest.ts
+─────────────────────────────────────────────────────────────
+import { test as base } from '@playwright/test';
+import { takeScreenshot } from '../utils/screenshotUtils';
+
+export const test = base.extend({
+  // Add custom fixtures here if needed
+});
+
+test.afterEach(async ({ page }, testInfo) => {
+  const screenshot = await page.screenshot({ fullPage: true });
+  await testInfo.attach("End of Test Screenshot", {
+    body: screenshot,
+    contentType: "image/png"
+  });
+
+  const name = testInfo.title
+    .replace(/[\s–\-]+/g, '_')
+    .replace(/[^a-z0-9_]/gi, '')
+    .toLowerCase() + '_final';
+  await takeScreenshot(page, name);
+});
+
+export { expect } from '@playwright/test';
+
+  CRITICAL: ALL test specs must import from this file, not @playwright/test
+  The afterEach hook auto-captures a final screenshot for every test.
+
+─────────────────────────────────────────────────────────────
+FILE: src/fixtures/auth.setup.ts
+─────────────────────────────────────────────────────────────
+import { test as setup } from '@playwright/test';
+import { URLs } from '../data/allURL';
+import testData from '../data/testdata';
+
+const AUTH_FILE = 'src/fixtures/.auth/user.json';
+
+setup('authenticate', async ({ page }) => {
+  setup.setTimeout(120000);
+
+  await page.goto(URLs.login, { waitUntil: 'domcontentloaded', timeout: 120000 });
+
+  // TODO: Update selectors and flow to match your application's login page
+  await page.locator('input[name="email"]').waitFor({ state: 'visible', timeout: 30000 });
+  await page.locator('input[name="email"]').fill(testData.login.validUser.email);
+  await page.locator('input[name="password"]').fill(testData.login.validUser.password);
+  await page.getByRole('button', { name: 'Login' }).click();
+
+  // TODO: Update URL pattern to match your app's post-login URL
+  await page.waitForURL(/\/dashboard/, { timeout: 60000, waitUntil: 'domcontentloaded' });
+
+  await page.context().storageState({ path: AUTH_FILE });
+});
+
+  HOW IT WORKS:
+  - Runs once before all tests via the 'setup' Playwright project
+  - Saves browser session (cookies, localStorage) to user.json
+  - All 'chromium' project tests load this session automatically
+  - Tests in 'chromium-no-auth' (login tests) ignore this session
+
+─────────────────────────────────────────────────────────────
+FILE: src/locators/example.locators.ts   (TEMPLATE — copy for each new page)
+─────────────────────────────────────────────────────────────
+import { Page } from '@playwright/test';
+
+export class ExampleLocators {
+  readonly page: Page;
+
+  constructor(page: Page) {
+    this.page = page;
+  }
+
+  // Section — Form inputs
+  get emailInput() {
+    return this.page.locator('input[name="email"]');
+  }
+
+  get passwordInput() {
+    return this.page.locator('input[name="password"]');
+  }
+
+  // Section — Actions
+  get submitButton() {
+    return this.page.getByRole('button', { name: 'Submit' });
+  }
+
+  // Section — Feedback
+  get successMessage() {
+    return this.page.getByRole('alert').filter({ hasText: 'Success' });
+  }
+
+  get errorMessage() {
+    return this.page.getByRole('alert').filter({ hasText: 'Error' });
+  }
+}
+
+  RULES:
+  - One class per page/feature
+  - Constructor takes Page, assign to readonly this.page
+  - Each locator is a getter (lazy evaluation = fresh element each call)
+  - Group related locators with // Section — Comment
+  - Use locator priority: getByTestId > getByRole > getByLabel > CSS
+  - Never define locators in page objects or test files
+
+─────────────────────────────────────────────────────────────
+FILE: src/pages/example.page.ts   (TEMPLATE — copy for each new page)
+─────────────────────────────────────────────────────────────
+import { Page, expect } from '@playwright/test';
+import { ExampleLocators } from '../locators/example.locators';
+import { takeScreenshot } from '../utils/screenshotUtils';
+
+export class ExamplePage {
+  readonly page: Page;
+  readonly locators: ExampleLocators;
+
+  constructor(page: Page) {
+    this.page = page;
+    this.locators = new ExampleLocators(page);
+  }
+
+  async navigate(url: string) {
+    await this.page.goto(url, { waitUntil: 'domcontentloaded' });
+  }
+
+  async verifyPageLoaded() {
+    await expect(this.locators.emailInput).toBeVisible();
+    await expect(this.locators.submitButton).toBeVisible();
+  }
+
+  async fillEmail(email: string) {
+    await this.locators.emailInput.fill(email);
+  }
+
+  async fillPassword(password: string) {
+    await this.locators.passwordInput.fill(password);
+  }
+
+  async submit() {
+    await expect(this.locators.submitButton).toBeEnabled({ timeout: 10000 });
+    await this.locators.submitButton.click();
+  }
+
+  async verifySuccess() {
+    await expect(this.locators.successMessage).toBeVisible({ timeout: 10000 });
+  }
+
+  async verifyError(expectedText?: string) {
+    await expect(this.locators.errorMessage).toBeVisible({ timeout: 10000 });
+    if (expectedText) {
+      await expect(this.locators.errorMessage).toContainText(expectedText);
+    }
+  }
+
+  async takeScreenshot(name: string) {
+    return await takeScreenshot(this.page, name);
+  }
+}
+
+  RULES:
+  - Each method = one logical user action
+  - Verify methods use expect() for element state checks
+  - Never put business logic in test files — all here
+  - Always include takeScreenshot() convenience method
+  - Instantiate locators class in constructor
+
+─────────────────────────────────────────────────────────────
+FILE: src/tests/example.spec.ts   (TEMPLATE — copy for each new feature)
+─────────────────────────────────────────────────────────────
+import { test, expect } from '../fixtures/baseTest';   // ← NEVER from @playwright/test
+import { URLs } from '../data/allURL';
+import testData from '../data/testdata';               // ← NEVER from testdata.json
+import { ExamplePage } from '../pages/example.page';
+
+test.describe('TC01 - Example Feature', () => {
+  let examplePage: ExamplePage;
+
+  test.beforeEach(async ({ page }) => {
+    examplePage = new ExamplePage(page);
+    await examplePage.navigate(URLs.dashboard);
+  });
+
+  test('TC01 - Page loads with required elements visible', async ({ page }) => {
+    // Step 1: Verify page loaded
+    await examplePage.verifyPageLoaded();
+    await examplePage.takeScreenshot('step1_page_loaded');
+  });
+
+  test('TC02 - Valid submission shows success message', async ({ page }) => {
+    // Step 1: Fill form
+    await examplePage.fillEmail(testData.login.validUser.email);
+    await examplePage.fillPassword(testData.login.validUser.password);
+    await examplePage.takeScreenshot('step1_form_filled');
+
+    // Step 2: Submit
+    await examplePage.submit();
+
+    // Step 3: Verify success
+    await examplePage.verifySuccess();
+    await examplePage.takeScreenshot('step2_success');
+  });
+
+  test('TC03 - Invalid credentials show error message', async ({ page }) => {
+    // Step 1: Fill with invalid credentials
+    await examplePage.fillEmail(testData.login.invalidUser.email);
+    await examplePage.fillPassword(testData.login.invalidUser.password);
+
+    // Step 2: Submit
+    await examplePage.submit();
+
+    // Step 3: Verify error
+    await examplePage.verifyError();
+    await examplePage.takeScreenshot('step1_error_shown');
+  });
+});
+
+  RULES:
+  - Import from baseTest, not @playwright/test
+  - Import testData from testdata.ts, not testdata.json
+  - test.describe() groups by feature with TC prefix
+  - test.beforeEach() instantiates page object and navigates
+  - Each test is fully independent
+  - Comment every step with // Step N: Description
+  - Take screenshots after key steps
+  - Keep spec files thin — all logic in page objects
+
+
+================================================================================
+ 7. UTILITY FILES (exact content)
+================================================================================
+
+─────────────────────────────────────────────────────────────
+FILE: src/utils/timeUtils.ts
+─────────────────────────────────────────────────────────────
+export function getTimestamp(): string {
+  const date = new Date();
+  const yyyy = date.getFullYear();
+  const mm = String(date.getMonth() + 1).padStart(2, '0');
+  const dd = String(date.getDate()).padStart(2, '0');
+  const hh = String(date.getHours()).padStart(2, '0');
+  const min = String(date.getMinutes()).padStart(2, '0');
+  const ss = String(date.getSeconds()).padStart(2, '0');
+  return `${yyyy}${mm}${dd}_${hh}${min}${ss}`;
+}
+
+─────────────────────────────────────────────────────────────
+FILE: src/utils/screenshotUtils.ts
+─────────────────────────────────────────────────────────────
+import { Page } from '@playwright/test';
+import { getTimestamp } from './timeUtils';
+
+export async function takeScreenshot(page: Page, name: string): Promise<string> {
+  const timestamp = getTimestamp();
+  const path = `reports/screenshots/${name}_${timestamp}.png`;
+  await page.screenshot({
+    path,
+    fullPage: false,
+    timeout: 5000
+  });
+  return path;
+}
+
+─────────────────────────────────────────────────────────────
+FILE: src/utils/assertUtils.ts
+─────────────────────────────────────────────────────────────
+import { expect, Locator, Page } from '@playwright/test';
+import { takeScreenshot } from './screenshotUtils';
+
+export async function expectVisible(locator: Locator, page: Page, name: string) {
+  await expect(locator).toBeVisible();
+  await takeScreenshot(page, `assert_${name}`);
+}
+
+─────────────────────────────────────────────────────────────
+FILE: src/utils/elementUtils.ts
+─────────────────────────────────────────────────────────────
+import { Locator } from '@playwright/test';
+
+export async function safeClick(locator: Locator) {
+  await locator.scrollIntoViewIfNeeded();
+  await locator.waitFor({ state: 'visible' });
+  await locator.click();
+}
+
+export async function safeFill(locator: Locator, text: string) {
+  await locator.waitFor({ state: 'visible' });
+  await locator.fill(text);
+}
+
+export async function getText(locator: Locator) {
+  await locator.waitFor({ state: 'visible' });
+  return await locator.textContent();
+}
+
+─────────────────────────────────────────────────────────────
+FILE: src/utils/waitUtils.ts
+─────────────────────────────────────────────────────────────
+import { Page, Locator } from '@playwright/test';
+
+export async function waitForElementVisible(locator: Locator) {
+  await locator.waitFor({ state: 'visible', timeout: 10000 });
+}
+
+export async function waitForPageLoad(page: Page) {
+  await page.waitForLoadState('networkidle');
+}
+
+export async function waitForElementClickable(locator: Locator) {
+  await locator.waitFor({ state: 'attached' });
+}
+
+UTILITY FUNCTION REFERENCE:
+┌──────────────────────┬──────────────────────────────────────────────────────┐
+│ Function             │ Purpose                                              │
+├──────────────────────┼──────────────────────────────────────────────────────┤
+│ takeScreenshot       │ Screenshot with YYYYMMdd_HHmmss timestamp            │
+│ getTimestamp         │ Formatted timestamp string                           │
+│ expectVisible        │ Assert visibility + auto-screenshot                  │
+│ safeClick            │ Scroll into view + wait visible + click              │
+│ safeFill             │ Wait visible + fill text                             │
+│ getText              │ Wait visible + get text content                      │
+│ waitForElementVisible│ Wait for locator to be visible (10s timeout)         │
+│ waitForPageLoad      │ Wait for networkidle state                           │
+│ waitForElementClick. │ Wait for locator to be attached to DOM               │
+└──────────────────────┴──────────────────────────────────────────────────────┘
+
+
+================================================================================
+ 8. TEST MANAGEMENT SYSTEM
+================================================================================
+
+FILE STRUCTURE:
+  test-management/
+  ├── testcases.json     — Array of test case objects
+  ├── tracker.json       — Map of { "id": "pending|done|skipped" }
+  ├── page-knowledge.json— Page interaction knowledge base
+  ├── parse-testcases.ts — Excel → testcases.json converter
+  └── next-testcase.ts   — CLI for managing test case status
+
+TESTCASES.JSON SCHEMA:
+[
+  {
+    "id": 1,
+    "module": "Authentication",
+    "screen": "Login Page",
+    "scenario": "Login with valid credentials",
+    "userEntity": "Registered User",
+    "userRole": "Admin",
+    "preconditions": "User account exists in system",
+    "testSteps": "1. Navigate to login\n2. Enter email\n3. Enter password\n4. Click Login",
+    "expectedResult": "User is redirected to dashboard",
+    "testData": "email: test@example.com"
+  }
+]
+
+TRACKER.JSON SCHEMA:
+{
+  "1": "done",
+  "2": "pending",
+  "3": "skipped"
+}
+
+CLI COMMANDS:
+  npm run tc:next           — Show next pending test case
+  npm run tc:show -- <id>   — Show specific test case details
+  npm run tc:status         — Show progress summary by module and screen
+  npm run tc:done -- <id>   — Mark test case as done
+  npm run tc:skip -- <id>   — Mark test case as skipped
+  npm run tc:parse -- file  — Parse Excel file into testcases.json
+
+EXCEL PARSING:
+  Required column headers in Excel:
+    - Module
+    - Function/Screen Name (or similar)
+    - Scenario name
+    - User Entity
+    - User Role
+    - Preconditions
+    - Test Steps
+    - Expected Result
+    - Test Data
+
+PAGE-KNOWLEDGE.JSON SCHEMA:
+{
+  "_meta": {
+    "description": "Page interaction knowledge base",
+    "last_updated": "YYYY-MM-DD"
+  },
+  "page_name": {
+    "interaction_patterns": {
+      "widget_name": {
+        "description": "What this widget is",
+        "steps": ["step 1", "step 2"],
+        "code_snippet": "optional Playwright code"
+      }
+    },
+    "behavioral_notes": {
+      "scenario_name": "description of behavior"
+    },
+    "known_quirks": {
+      "quirk_name": {
+        "problem": "what goes wrong",
+        "fix": "proven workaround"
+      }
+    }
+  }
+}
+
+
+================================================================================
+ 9. CLAUDE CODE INTEGRATION
+================================================================================
+
+OVERVIEW:
+Claude Code uses three agent files and four slash command files to provide
+AI-assisted test automation. The agent files define the AI's behavior; the
+command files define step-by-step workflows for common tasks.
+
+AGENTS (read by Claude before doing anything):
+┌─────────────────────────────┬──────────────────────────────────────────────┐
+│ File                        │ Purpose                                      │
+├─────────────────────────────┼──────────────────────────────────────────────┤
+│ playwright-agent.md         │ POM conventions, locator priority, waits,    │
+│                             │ naming, anti-patterns, test structure rules  │
+├─────────────────────────────┼──────────────────────────────────────────────┤
+│ app-config.md               │ Your app's auth details, URLs, page catalog  │
+│                             │ (THE ONLY FILE YOU EDIT FOR A NEW APP)       │
+├─────────────────────────────┼──────────────────────────────────────────────┤
+│ knowledge-layer.md          │ 6-layer knowledge check system (page-know    │
+│                             │ ledge.json → locators → utils → pages →      │
+│                             │ tests → MCP)                                 │
+├─────────────────────────────┼──────────────────────────────────────────────┤
+│ playwright-qa-engineer.md   │ Agent definition for test creation and fix   │
+├─────────────────────────────┼──────────────────────────────────────────────┤
+│ test-healer.md              │ Agent for diagnosing and fixing failures      │
+└─────────────────────────────┴──────────────────────────────────────────────┘
+
+APP-CONFIG.MD — FILL IN FOR YOUR APPLICATION:
+  - Application Name
+  - Environment (staging/production)
+  - Base URL
+  - Auth method (email+password, SSO, OTP, etc.)
+  - Env vars used (LOGIN_EMAIL, LOGIN_PASSWORD, etc.)
+  - Test case source (Excel file name, if any)
+  - Pages & URLs catalog
+  - Existing page objects and key methods (fill in as you build)
+
+MCP CONFIGURATION:
+  The Playwright MCP server allows Claude to:
+  - Navigate to live pages in an isolated browser
+  - Capture accessibility tree snapshots
+  - Click, fill, type, drag, press keys
+  - Take screenshots
+  - Read network requests
+
+  MCP runs with:
+  - --isolated mode (sandboxed browser session)
+  - --storage-state pointing to cached auth session
+  - --output-dir ./mcp-output for screenshots
+
+  Authorized MCP operations (in .claude/settings.local.json):
+    browser_navigate, browser_snapshot, browser_fill_form,
+    browser_click, browser_wait_for, browser_type, browser_evaluate,
+    browser_take_screenshot, browser_close, browser_press_key,
+    browser_run_code, browser_drag, browser_hover, browser_network_requests
+
+
+================================================================================
+ 10. SLASH COMMAND WORKFLOWS
+================================================================================
+
+/write-test <id or description>
+─────────────────────────────────
+PURPOSE: Implement a test case end-to-end (locators + page obj + spec)
+
+WORKFLOW:
+  1. Parse input — if numeric ID, run `npm run tc:show -- <id>`
+                   if description, use directly
+  2. Walk knowledge layers (see Section 20)
+  3. Inspect live page via MCP (only if layers 1-5 insufficient)
+  4. Decide file strategy (add to existing or create new)
+  5. Implement in order:
+     a. src/locators/<feature>.locators.ts
+     b. src/pages/<feature>.page.ts
+     c. src/tests/<feature>.spec.ts
+     d. src/data/testdata.json (if new test data needed)
+     e. src/data/allURL.ts (if new URLs needed)
+  6. Run: npx playwright test src/tests/<file>.spec.ts --project=chromium
+  7. Update page-knowledge.json with non-obvious findings
+  8. Mark done: npm run tc:done -- <id>
+  9. Show progress: npm run tc:status
+
+/discover-page <url or page name>
+───────────────────────────────────
+PURPOSE: Explore a page and auto-scaffold locators + page object
+
+WORKFLOW:
+  1. Navigate via MCP: browser_navigate to URL
+  2. Snapshot via MCP: browser_snapshot (full accessibility tree)
+  3. Identify all interactive elements (inputs, buttons, dropdowns, grids)
+  4. Test interactions via MCP: browser_click, browser_fill_form, etc.
+  5. Update knowledge base:
+     - test-management/page-knowledge.json (patterns, behaviors, quirks)
+     - src/locators/<feature>.locators.ts (create or update)
+     - src/pages/<feature>.page.ts (create or update)
+  6. Report: elements found, files created/updated
+
+/next-test [count]
+────────────────────
+PURPOSE: Pick up and implement the next pending test case(s)
+
+WORKFLOW:
+  1. Run npm run tc:next to get next pending test case
+  2. If count > 1, implement each sequentially
+  3. For each: run /write-test workflow
+  4. After each: mark done/skipped, then fetch next
+  5. Show final summary with IDs and outcomes
+
+/heal-test <file or TC id>
+────────────────────────────
+PURPOSE: Diagnose and fix failing tests
+
+WORKFLOW:
+  1. Resolve target (spec file, TC ID, or specific test)
+  2. Run tests and capture all failures
+  3. For each failure:
+     a. Read error — identify line, assertion, error type
+     b. Check knowledge layers (known quirk? outdated locator?)
+     c. Use MCP if selector needs live DOM inspection
+  4. Fix in correct layer:
+     - Wrong selector → src/locators/<feature>.locators.ts
+     - Wrong interaction/wait → src/pages/<feature>.page.ts
+     - Wrong assertion → page object verify method
+     - Wrong test data → src/data/testdata.json
+     - Wrong URL → src/data/allURL.ts
+  5. Re-run to verify fix
+  6. Update page-knowledge.json with non-obvious findings
+  7. Report: root cause, fix applied, pass/fail result
+
+COMMON FAILURE PATTERNS:
+┌─────────────────────────────────┬──────────────────────────┬────────────────────────────┐
+│ Error                           │ Likely Cause             │ Fix                        │
+├─────────────────────────────────┼──────────────────────────┼────────────────────────────┤
+│ Timeout: toBeVisible            │ Selector wrong/not render│ MCP inspect, update locator│
+│ strict mode violation: N elems  │ Selector too broad       │ Make selector more specific│
+│ expect(received).toBe(expected) │ App behavior changed     │ Update page obj or testdata│
+│ Timeout: toBeEnabled            │ Element not interactive  │ Better wait in page obj    │
+│ page.goto: net::ERR_*           │ URL wrong / staging down │ Fix allURL.ts or retry     │
+│ Flaky (passes sometimes)        │ Race condition           │ Add expect.poll(), proper  │
+│                                 │                          │ waits                      │
+└─────────────────────────────────┴──────────────────────────┴────────────────────────────┘
+
+2-ATTEMPT DEBUGGING RULE:
+  If the same root cause error appears after 2 fix-and-rerun cycles:
+  - STOP — do not make a 3rd speculative fix
+  - Report: exact error + attempt 1 + attempt 2 + diagnosis + what is needed
+  - This prevents wasting time on fixes that don't address root cause
+
+
+================================================================================
+ 11. FRAMEWORK CONVENTIONS & RULES
+================================================================================
+
+CRITICAL IMPORT RULES:
+  ✅ CORRECT:
+    import { test, expect } from '../fixtures/baseTest';
+    import { URLs } from '../data/allURL';
+    import testData from '../data/testdata';
+
+  ❌ WRONG (will cause issues):
+    import { test, expect } from '@playwright/test';
+    import testdata from './testdata.json';
+
+FILE NAMING CONVENTIONS:
+┌──────────────────┬────────────────────────┬────────────────────────────────┐
+│ Type             │ Pattern                │ Example                        │
+├──────────────────┼────────────────────────┼────────────────────────────────┤
+│ Test spec        │ <feature>.spec.ts      │ user-management.spec.ts        │
+│ Page object      │ <feature>.page.ts      │ user-management.page.ts        │
+│ Locator file     │ <feature>.locators.ts  │ user-management.locators.ts    │
+│ Test describe    │ 'TCXX - Feature Name'  │ 'TC05 - User Management'       │
+│ Test name        │ 'TCXX - description'   │ 'TC05 - Create user succeeds'  │
+│ Screenshot name  │ snake_case step-descr. │ step1_form_submitted           │
+└──────────────────┴────────────────────────┴────────────────────────────────┘
+
+TEST STRUCTURE RULES:
+  - test.describe('TCXX - Feature Name') groups related tests
+  - test.beforeEach() instantiates page object and navigates to start URL
+  - Each test() is independent — no shared mutable state between tests
+  - Comment each step: // Step N: Description
+  - Keep spec files thin — all actions and assertions in page object methods
+  - Take screenshots after each major step
+
+ASSERTION RULES:
+  - Page objects CAN use expect() in verify methods (e.g., verifyPageLoaded)
+  - Test files use expect() only for final test assertions
+  - Always validate: navigation (URL), visibility, text, element state
+
+TEST ISOLATION:
+  - Each test must be independent — never depend on execution order
+  - Use test.describe.serial() ONLY for true sequential dependencies
+    (e.g., create → verify → delete workflow)
+  - Clean up test data when possible
+  - Use unique identifiers for data created during tests
+
+TEST DATA RULES:
+  - All test data in src/data/testdata.json
+  - Never hardcode values in test files
+  - Sensitive values use $ENV_VAR placeholders
+  - All URLs in src/data/allURL.ts
+  - Never hardcode URLs in tests
+
+SCREENSHOT RULES:
+  - Take screenshot after each major step
+  - Use descriptive snake_case names: step1_page_loaded, step2_form_submitted
+  - baseTest.ts already captures end-of-test screenshots automatically
+  - Screenshots go to reports/screenshots/ with timestamp
+
+
+================================================================================
+ 12. LOCATOR PRIORITY STRATEGY
+================================================================================
+
+USE IN THIS ORDER (most preferred first):
+
+  1. getByTestId('data-testid-value')
+     Best: stable, developer-controlled, immune to UI changes
+     Use when: HTML has data-testid attributes
+
+  2. getByRole('button', { name: 'Submit' })
+     Best: accessible name is stable, resilient to class/style changes
+     Use when: buttons, links, headings, checkboxes, textboxes with roles
+
+  3. getByLabel('Email address')
+     Best: tied to form semantics, works with aria-label too
+     Use when: form fields with <label> elements
+
+  4. getByPlaceholder('Enter your email')
+     Good: often stable for input fields
+     Use when: inputs with placeholder attributes
+
+  5. Stable CSS selectors
+     Acceptable: input[name="email"], [data-cy="submit"], .submit-button
+     Use when: semantic selectors are unavailable
+
+  NEVER USE:
+  - Dynamic IDs (#ember123, #react-select-2-input) — change on every render
+  - XPath — fragile, verbose, hard to maintain
+  - nth() or index-based selectors — break when data changes
+  - .css-class that is generated (e.g., CSS-in-JS hashes)
+
+COMMON LOCATOR PATTERNS:
+  // Role-based (preferred for interactive elements)
+  page.getByRole('button', { name: 'Save' })
+  page.getByRole('link', { name: 'Dashboard' })
+  page.getByRole('textbox', { name: 'Search' })
+  page.getByRole('checkbox', { name: 'Remember me' })
+  page.getByRole('combobox', { name: 'Country' })
+
+  // Filtering for specificity
+  page.getByRole('alert').filter({ hasText: 'Success' })
+  page.locator('.modal').getByRole('button', { name: 'Confirm' })
+
+  // Exact text matching (prevents substring traps)
+  page.getByText('Active', { exact: true })
+  page.getByRole('button', { name: /^Active/ })  // regex anchor
+
+
+================================================================================
+ 13. WAIT STRATEGIES
+================================================================================
+
+CORRECT WAIT PATTERNS:
+┌───────────────────────────────────┬────────────────────────────────────────┐
+│ Strategy                          │ When to Use                            │
+├───────────────────────────────────┼────────────────────────────────────────┤
+│ waitUntil: 'domcontentloaded'     │ Initial page navigation                │
+│ await expect(locator).toBeVisible │ Wait for element to appear             │
+│ await expect(locator).toBeEnabled │ Wait for element to be interactive     │
+│ await expect.poll(() => fn)       │ Wait for a value to change             │
+│ await page.waitForURL(/pattern/)  │ Wait for navigation to complete        │
+│ waitForLoadState('networkidle')   │ After actions that trigger data reload │
+│   .catch(() => {})                │ (MUST wrap in catch — may not settle)  │
+└───────────────────────────────────┴────────────────────────────────────────┘
+
+NEVER USE:
+  page.waitForTimeout(5000)  — flaky, slow, masks real issues
+
+ASSERTION-BASED WAIT (preferred over network waits):
+  // Fragile
+  await page.waitForLoadState('networkidle');
+  await button.click();
+
+  // Robust — waits for actual element state
+  await expect(button).toBeEnabled({ timeout: 60000 });
+  await button.click();
+
+DYNAMIC DATA (use expect.poll):
+  // Fragile — checks once, may race with loading
+  const count = await getRowCount();
+  expect(count).toBe(5);
+
+  // Robust — retries until condition is met
+  await expect.poll(() => getRowCount(), { timeout: 30000 }).toBe(5);
+
+NETWORKIDLE (always wrap):
+  // Staging may never fully settle — always use with catch
+  await page.waitForLoadState('networkidle', { timeout: 10000 }).catch(() => {});
+
+
+================================================================================
+ 14. TEST RELIABILITY PATTERNS
+================================================================================
+
+REACT-SELECT / AUTOCOMPLETE FIELDS:
+  await fieldLocator.click();
+  await fieldLocator.fill('');
+  await fieldLocator.pressSequentially(searchText, { delay: 100 });
+  const option = page.getByText(optionText, { exact: true });
+  await option.first().waitFor({ state: 'visible', timeout: 10000 });
+  await option.first().click();
+
+GUARD AGAINST FLAKY CLICKS:
+  await expect(button).toBeEnabled({ timeout: 60000 });
+  await page.waitForLoadState('networkidle', { timeout: 30000 }).catch(() => {});
+  await button.click();
+
+SUBSTRING MATCHING TRAPS:
+  // Bad — ":has-text('Active')" matches "Inactive" too
+  page.locator('button:has-text("Active")');
+
+  // Good — exact match or regex anchor
+  page.getByRole('button', { name: /^Active/ });
+  page.getByText('Active', { exact: true });
+
+ACCESSIBLE ROLE SELECTORS (resilient to style changes):
+  // Bad — CSS class may change
+  page.locator('button.btn-primary');
+
+  // Good — accessible name is stable
+  page.getByRole('button', { name: 'Save' });
+
+
+================================================================================
+ 15. AUTH & PROJECT MAPPING
+================================================================================
+
+HOW AUTH WORKS:
+  1. auth.setup.ts runs ONCE before all tests
+  2. It performs the full login flow
+  3. Browser session is saved to src/fixtures/.auth/user.json
+  4. All 'chromium' project tests load this session automatically
+  5. Tests start already logged in — no manual login needed in beforeEach
+
+PROJECT SELECTION:
+┌───────────────────────┬─────────────────────────────────────────────────────┐
+│ Project               │ Use For                                             │
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ chromium              │ All non-login tests (reuses cached auth session)    │
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ chromium-no-auth      │ Login tests only (clean session, no cached auth)   │
+├───────────────────────┼─────────────────────────────────────────────────────┤
+│ setup                 │ Auth setup only (runs automatically before chromium)│
+└───────────────────────┴─────────────────────────────────────────────────────┘
+
+RUN COMMANDS BY PROJECT:
+  npx playwright test src/tests/login.spec.ts --project=chromium-no-auth
+  npx playwright test src/tests/dashboard.spec.ts --project=chromium
+  npx playwright test --project=chromium  # run all non-login tests
+
+CREDENTIALS STORAGE:
+  - Actual credentials: .env file (gitignored)
+  - Placeholder in testdata.json: "$LOGIN_EMAIL", "$LOGIN_PASSWORD"
+  - Resolved at runtime by testdata.ts
+
+
+================================================================================
+ 16. RUNNING TESTS
+================================================================================
+
+BASIC COMMANDS:
+  npm test                                               # all tests
+  npx playwright test                                    # same as above
+  npx playwright test --headed                           # show browser
+  npx playwright test --list                             # list all tests
+  npx playwright test --ui                               # interactive UI mode
+
+BY FILE:
+  npx playwright test src/tests/login.spec.ts --project=chromium-no-auth
+  npx playwright test src/tests/dashboard.spec.ts --project=chromium
+
+BY TEST TITLE:
+  npx playwright test -g "TC01" --project=chromium
+  npx playwright test -g "TC01 - Page loads" --project=chromium
+
+BY PROJECT:
+  npx playwright test --project=chromium
+  npx playwright test --project=chromium-no-auth
+  npx playwright test --project=setup
+
+DEBUG MODE:
+  npx playwright test --debug                            # step-through debugger
+  npx playwright test --trace on                         # force trace recording
+  npx playwright show-trace test-results/**/trace.zip    # view saved trace
+
+WORKERS / PARALLELISM:
+  npx playwright test --workers=4                        # run 4 tests in parallel
+  npx playwright test --workers=1                        # run sequentially
+
+RETRIES:
+  npx playwright test --retries=3                        # retry failing tests 3x
+
+
+================================================================================
+ 17. REPORTING
+================================================================================
+
+ALLURE REPORT (rich interactive dashboard):
+  npm run allure:generate    # generate from allure-results/
+  npm run allure:open        # open in browser
+  # or combined:
+  npm run allure:generate && npm run allure:open
+
+PLAYWRIGHT HTML REPORT:
+  npx playwright show-report           # open last run's HTML report
+
+SCREENSHOTS:
+  - Auto-captured on test failure (configured in playwright.config.ts)
+  - Manually captured in page objects via takeScreenshot()
+  - End-of-test screenshot auto-captured by baseTest.ts afterEach hook
+  - Location: reports/screenshots/<name>_<timestamp>.png
+
+TRACE VIEWER:
+  npx playwright show-trace test-results/**/trace.zip
+  - Retained on failure (configured in playwright.config.ts)
+  - Shows step-by-step actions, screenshots, network, console
+
+VIDEO:
+  - Retained on failure (configured in playwright.config.ts)
+  - Location: test-results/
+
+
+================================================================================
+ 18. ANTI-PATTERNS (NEVER DO THESE)
+================================================================================
+
+TEST STRUCTURE:
+  ❌ Do NOT use page.waitForTimeout() — use assertion-based waits
+  ❌ Do NOT put locators in test files — use src/locators/ classes
+  ❌ Do NOT put action/assertion logic in spec files — use page objects
+  ❌ Do NOT hardcode URLs in tests — use src/data/allURL.ts
+  ❌ Do NOT hardcode credentials in tests — use testdata + .env
+  ❌ Do NOT import { test } from '@playwright/test' — use baseTest
+  ❌ Do NOT import testdata.json directly — use testdata.ts
+  ❌ Do NOT skip screenshot steps — required for debugging
+
+LOCATORS:
+  ❌ Do NOT use dynamic IDs (#ember123, #react-select-2)
+  ❌ Do NOT use XPath unless absolutely no CSS alternative
+  ❌ Do NOT use nth() or index-based selectors
+  ❌ Do NOT guess selectors — use MCP to inspect live DOM
+
+CODE ORGANIZATION:
+  ❌ Do NOT create duplicate page objects — check existing files first
+  ❌ Do NOT create a new spec file if one exists for the same module
+  ❌ Do NOT duplicate utility logic — check src/utils/ first
+  ❌ Do NOT create inline Playwright scripts (node -e) — use test files
+
+WAITS:
+  ❌ Do NOT use networkidle without timeout and .catch() block
+  ❌ Do NOT chain multiple waitForTimeout() to "wait longer"
+  ❌ Do NOT use hard-coded sleep to wait for animations
+
+
+================================================================================
+ 19. DEBUGGING GUIDE
+================================================================================
+
+WHEN A TEST FAILS — DIAGNOSTIC PROCESS:
+
+  1. READ THE ERROR CAREFULLY
+     - What line failed?
+     - What assertion failed?
+     - Is it a timeout, strict mode violation, navigation error?
+
+  2. CHECK KNOWLEDGE LAYERS FIRST (before MCP)
+     - Is this a known quirk in page-knowledge.json?
+     - Is the locator outdated in src/locators/?
+     - Is the page object method wrong in src/pages/?
+
+  3. USE MCP IF NEEDED (when error is unclear or selector needs inspection)
+     - browser_navigate to the failing URL
+     - browser_snapshot to see current DOM
+     - browser_click / browser_type to verify interactions
+
+  4. FIX IN CORRECT LAYER
+     - Selector wrong → src/locators/<feature>.locators.ts
+     - Wait logic wrong → src/pages/<feature>.page.ts
+     - Test data wrong → src/data/testdata.json
+     - URL wrong → src/data/allURL.ts
+     - Test flow wrong → src/tests/<feature>.spec.ts (last resort)
+
+  5. RE-RUN SPECIFIC TEST
+     npx playwright test src/tests/<file>.spec.ts -g "TCXX" --project=chromium
+
+  2-ATTEMPT RULE:
+  If same root cause error after 2 fix cycles:
+  - STOP immediately
+  - Report: exact error + attempt 1 + attempt 2 + diagnosis + what is needed
+  - Do not make a 3rd speculative fix
+
+USEFUL DEBUG COMMANDS:
+  npx playwright test --debug                  # step-through debugger
+  npx playwright test --headed                 # see browser
+  npx playwright codegen https://your-app.com  # record interactions
+  npx playwright show-trace path/to/trace.zip  # view detailed trace
+
+
+================================================================================
+ 20. KNOWLEDGE LAYER SYSTEM
+================================================================================
+
+PURPOSE: Check what you already know before using MCP (browser inspection).
+         Each layer builds on the previous. Only go to the next when the
+         current layer doesn't have what you need.
+
+LAYERS IN ORDER:
+
+  Layer 1: test-management/page-knowledge.json
+  ─────────────────────────────────────────────
+  Primary knowledge base. Contains per-page entries:
+  - interaction_patterns: How to operate complex widgets
+  - behavioral_notes: What the app does in specific scenarios
+  - known_quirks: Timing issues and proven fixes
+  RULE: If documented here, do NOT use MCP.
+
+  Layer 2: src/locators/*.locators.ts
+  ────────────────────────────────────
+  Source of truth for element selectors.
+  Before defining any new locator, check if it already exists here.
+
+  Layer 3: src/utils/*.ts
+  ────────────────────────
+  Shared helper functions. Check here before writing any helper logic.
+  If a similar function exists, use it.
+
+  Layer 4: src/pages/*.page.ts
+  ─────────────────────────────
+  Reusable interaction logic. Check here and app-config.md before
+  writing any new methods.
+
+  Layer 5: src/tests/*.spec.ts
+  ─────────────────────────────
+  Existing test patterns to reference. Check how similar scenarios
+  were structured (serial mode, beforeEach navigation, polling, etc.)
+
+  Layer 6: Playwright MCP (LAST RESORT)
+  ──────────────────────────────────────
+  Use ONLY when layers 1-5 don't have what you need:
+  - Page has no entry in page-knowledge.json
+  - Needed selector doesn't exist in locator files
+  - Widget interaction pattern is unknown
+
+AFTER MCP DISCOVERY — ALWAYS UPDATE:
+  1. Add interaction patterns/behaviors/quirks to page-knowledge.json
+  2. Add new locators to src/locators/<feature>.locators.ts
+  3. Add new methods to src/pages/<feature>.page.ts
+
+KNOWLEDGE BASE UPDATES ARE ALSO REQUIRED WHEN:
+  - You fixed a non-obvious test failure
+  - You discovered a DOM ordering quirk
+  - You found a timing issue with a specific widget
+  - You learned a validation rule or default value behavior
+  Any non-obvious finding during implementation belongs in page-knowledge.json.
+
+
+================================================================================
+ 21. FILE NAMING REFERENCE
+================================================================================
+
+COMPLETE FILE MAP FOR A FEATURE (e.g., "User Management"):
+
+  src/locators/user-management.locators.ts
+  src/pages/user-management.page.ts
+  src/tests/user-management.spec.ts
+
+INSIDE THE TEST FILE:
+  test.describe('TC10 - User Management')
+  test('TC10 - Create new user shows success toast')
+  test('TC11 - Edit user name updates immediately')
+
+SCREENSHOT NAMES:
+  step1_page_loaded
+  step2_create_user_form_filled
+  step3_user_created_success
+  step4_user_list_updated
+
+LOCATOR CLASS NAME: UserManagementLocators
+PAGE CLASS NAME: UserManagementPage
+
+URL KEY IN allURL.ts:
+  userManagement: `${BASE_URL}/users`
+  userCreate: `${BASE_URL}/users/new`
+
+TESTDATA KEY IN testdata.json:
+  "userManagement": {
+    "newUser": { "name": "Test User", "email": "newuser@example.com" },
+    "editedName": "Updated Name"
+  }
+
+
+================================================================================
+ QUICK REFERENCE CARD
+================================================================================
+
+SETUP NEW PROJECT:
+  1. npm install && npx playwright install
+  2. cp .env.example .env && edit .env
+  3. Edit src/data/allURL.ts (add your URLs)
+  4. Edit src/fixtures/auth.setup.ts (update login selectors)
+  5. Edit src/data/testdata.json (add test data)
+  6. Edit .claude/agents/app-config.md (document your app)
+  7. /discover-page <url> for each major page
+  8. /write-test <id> or /next-test
+
+ADD NEW FEATURE TEST:
+  1. cp src/locators/example.locators.ts src/locators/<feature>.locators.ts
+  2. cp src/pages/example.page.ts src/pages/<feature>.page.ts
+  3. cp src/tests/example.spec.ts src/tests/<feature>.spec.ts
+  4. Update all three files for your feature
+  5. Add URLs to allURL.ts, test data to testdata.json
+
+RUN TESTS:
+  npm test                                                        # all
+  npx playwright test src/tests/<f>.spec.ts --project=chromium    # file
+  npx playwright test -g "TC01" --project=chromium                # by ID
+  npx playwright test src/tests/login.spec.ts --project=chromium-no-auth
+
+REPORTS:
+  npm run allure:generate && npm run allure:open
+  npx playwright show-report
+
+TEST MANAGEMENT:
+  npm run tc:status      # progress overview
+  npm run tc:next        # next pending test
+  npm run tc:done -- 5   # mark test #5 done
+  npm run tc:skip -- 5   # mark test #5 skipped
+
+CLAUDE COMMANDS:
+  /discover-page <url>      # explore page, scaffold files
+  /write-test <id or desc>  # implement test end-to-end
+  /next-test                # implement next pending test
+  /heal-test <file or id>   # fix failing test(s)
+
+================================================================================
+ END OF DOCUMENT
+================================================================================

@@ -1,0 +1,16 @@
+{
+  "login": {
+    "validUser": {
+      "email": "$LOGIN_EMAIL",
+      "password": "$LOGIN_PASSWORD"
+    },
+    "invalidUser": {
+      "email": "invalid@example.com",
+      "password": "wrongpassword"
+    }
+  },
+  "example": {
+    "validInput": "sample value",
+    "searchQuery": "test search"
+  }
+}

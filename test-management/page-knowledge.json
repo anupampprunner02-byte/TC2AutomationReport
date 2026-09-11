@@ -1,0 +1,26 @@
+{
+  "_meta": {
+    "description": "Page interaction knowledge base — add entries here as you discover page behavior via MCP or test debugging",
+    "last_updated": "YYYY-MM-DD"
+  },
+  "_schema": {
+    "page_name": {
+      "interaction_patterns": {
+        "widget_name": {
+          "description": "What this widget is and how it behaves",
+          "steps": ["step 1", "step 2"],
+          "code_snippet": "optional Playwright code snippet"
+        }
+      },
+      "behavioral_notes": {
+        "scenario_name": "description of how the app behaves in this scenario"
+      },
+      "known_quirks": {
+        "quirk_name": {
+          "problem": "what goes wrong or surprises you",
+          "fix": "proven workaround"
+        }
+      }
+    }
+  }
+}

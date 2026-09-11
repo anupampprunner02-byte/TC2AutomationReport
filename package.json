@@ -1,0 +1,43 @@
+{
+  "name": "playwright-base-framework",
+  "version": "1.0.0",
+  "description": "Generic Playwright + TypeScript QA automation framework using Page Object Model with Claude Code integration",
+  "main": "index.js",
+  "scripts": {
+    "test": "npx playwright test",
+    "allure:generate": "allure generate ./allure-results --clean",
+    "allure:open": "allure open",
+    "tc:parse": "npx tsx test-management/parse-testcases.ts",
+    "tc:parse:file": "npx tsx test-management/parse-testcases.ts",
+    "tc:next": "npx tsx test-management/next-testcase.ts",
+    "tc:status": "npx tsx test-management/next-testcase.ts status",
+    "tc:done": "npx tsx test-management/next-testcase.ts done",
+    "tc:skip": "npx tsx test-management/next-testcase.ts skip",
+    "tc:show": "npx tsx test-management/next-testcase.ts show"
+  },
+  "type": "module",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/anupampprunner02-byte/TC2AutomationReport.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/anupampprunner02-byte/TC2AutomationReport/issues"
+  },
+  "homepage": "https://github.com/anupampprunner02-byte/TC2AutomationReport#readme",
+  "description": "",
+  "devDependencies": {
+    "@playwright/test": "^1.58.2",
+    "@types/node": "^25.3.5",
+    "allure-commandline": "^2.37.0",
+    "allure-playwright": "^3.6.0",
+    "dotenv": "^17.3.1",
+    "xlsx": "^0.18.5"
+  },
+  "dependencies": {
+    "playwright": "^1.58.2",
+    "playwright-mcp": "^0.0.10"
+  }
+}

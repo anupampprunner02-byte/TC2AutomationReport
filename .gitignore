@@ -1,0 +1,21 @@
+
+# Playwright
+node_modules/
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+/src/fixtures/.auth/
+/allure-results/
+/reports/
+/allure-report/
+/allure-results/
+
+# Environment variables
+.env
+.env.*
+
+# MCP artifacts
+/.playwright-mcp/
+/mcp-output/
